@@ -3,7 +3,6 @@ import { AccessibilityProvider, useAccessibility } from './context/Accessibility
 import AccessibilityModal from './components/AccessibilityModal'
 import DesktopSidebar from './components/DesktopSidebar'
 import BottomNav from './components/BottomNav'
-import LandingPage from './screens/LandingPage'
 import SplashScreen from './screens/SplashScreen'
 import SignUpScreen from './screens/SignUpScreen'
 import StruggleScreen from './screens/StruggleScreen'
@@ -16,7 +15,6 @@ import ChildProfile from './screens/ChildProfile'
 import WordSplashGame from './games/wordsplash/WordSplashGame'
 
 export type Screen =
-  | 'landing'
   | 'splash'
   | 'signup'
   | 'login'
@@ -38,7 +36,7 @@ export interface AppState {
 }
 
 const SCREEN_PATHS: Record<Screen, string> = {
-  landing: '/', splash: '/welcome', signup: '/signup', login: '/login',
+  splash: '/', signup: '/signup', login: '/login',
   struggle: '/learning-needs', congratulations: '/ready',
   caregiver: '/caregiver', student: '/student', games: '/games',
   family: '/family', 'child-profile': '/child-profile', wordsplash: '/wordsplash',
@@ -46,7 +44,7 @@ const SCREEN_PATHS: Record<Screen, string> = {
 
 function screenFromLocation(): Screen {
   const path = window.location.pathname.replace(/\/+$/, '') || '/'
-  return (Object.keys(SCREEN_PATHS) as Screen[]).find(screen => SCREEN_PATHS[screen] === path) ?? 'landing'
+  return (Object.keys(SCREEN_PATHS) as Screen[]).find(screen => SCREEN_PATHS[screen] === path) ?? 'splash'
 }
 
 function MainApp() {
@@ -85,7 +83,7 @@ function MainApp() {
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      const anchor = currentScreen === 'landing' && window.location.hash
+      const anchor = currentScreen === 'splash' && window.location.hash
         ? document.getElementById(window.location.hash.slice(1)) : null
       if (anchor) anchor.scrollIntoView()
       else document.querySelectorAll('.desktop-content-body, .screen-scroll, .auth-screen')
@@ -110,12 +108,11 @@ function MainApp() {
 
   const handleLogout = () => {
     setAppState({ selectedStruggle: null, userRole: null, selectedChildId: null })
-    navigate('landing')
+    navigate('splash')
   }
 
   const isDesktop = activeLayout === 'desktop'
   const isAuthScreen = [
-    'landing',
     'splash',
     'signup',
     'login',
@@ -130,13 +127,6 @@ function MainApp() {
   const renderActiveScreen = () => {
     return (
       <>
-        {currentScreen === 'landing' && (
-          <LandingPage
-            onSignUp={() => navigate('splash')}
-            onLogin={() => navigate('login')}
-          />
-        )}
-
         {currentScreen === 'splash' && (
           <SplashScreen onNext={() => navigate('signup', true)} />
         )}
@@ -145,7 +135,7 @@ function MainApp() {
           <SignUpScreen
             key={currentScreen}
             mode={currentScreen}
-            onBack={() => navigate('landing')}
+            onBack={() => navigate('splash')}
             onModeChange={() => navigate(currentScreen === 'signup' ? 'login' : 'signup')}
             onContinue={(role: UserRole) => {
               setAppState((s) => ({ ...s, userRole: role }))
@@ -257,9 +247,7 @@ function MainApp() {
             width: '100vw',
             height: '100vh',
             background:
-              currentScreen === 'landing'
-                ? '#0B1628'
-                : currentScreen === 'struggle'
+              currentScreen === 'struggle'
                 ? '#4A4FD4'
                 : currentScreen === 'splash' || currentScreen === 'congratulations'
                 ? '#2ECC71'
@@ -270,7 +258,7 @@ function MainApp() {
             <div
               className="desktop-content-inner"
               style={{
-                maxWidth: currentScreen === 'landing' ? 'none' : 960,
+                maxWidth: 960,
                 margin: '0 auto',
                 minHeight: '100vh',
                 display: 'flex',
